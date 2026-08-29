@@ -1,0 +1,431 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+  --primary: #70153a;
+  --secondary: #efc975;
+  --cream: #fff9f5; 
+  --motion-fast: 150ms;
+  --motion-base: 220ms;
+  --motion-slow: 350ms;
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --soft-shadow: 0 14px 40px rgba(112, 21, 58, 0.08);
+  --soft-shadow-hover: 0 22px 60px rgba(112, 21, 58, 0.14);
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgba(239, 201, 117, 0.45);
+  color: var(--primary);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  transition:
+    color var(--motion-base) var(--ease-premium),
+    background-color var(--motion-base) var(--ease-premium),
+    border-color var(--motion-base) var(--ease-premium),
+    box-shadow var(--motion-base) var(--ease-premium),
+    transform var(--motion-fast) var(--ease-premium),
+    opacity var(--motion-base) var(--ease-premium);
+}
+
+button:not(:disabled):hover,
+a[class*="bg-"]:hover,
+a[class*="border"]:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(112, 21, 58, 0.12);
+}
+
+button:not(:disabled):active,
+a[class*="bg-"]:active,
+a[class*="border"]:active {
+  transform: translateY(0) scale(0.97);
+}
+
+button:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 4px rgba(112, 21, 58, 0.08);
+}
+
+.rounded-xl.border,
+.rounded-2xl.border,
+.rounded-3xl.border,
+.rounded-lg.border {
+  transition:
+    transform var(--motion-base) var(--ease-premium),
+    box-shadow var(--motion-base) var(--ease-premium),
+    border-color var(--motion-base) var(--ease-premium),
+    background-color var(--motion-base) var(--ease-premium);
+}
+
+.rounded-xl.border:hover,
+.rounded-2xl.border:hover,
+.rounded-3xl.border:hover {
+  border-color: rgba(112, 21, 58, 0.22);
+  box-shadow: var(--soft-shadow-hover);
+}
+
+.bg-white.rounded-xl.border,
+.bg-white.rounded-2xl.border,
+.bg-white.rounded-3xl.border,
+.rounded-xl.bg-white,
+.rounded-2xl.bg-white,
+.rounded-3xl.bg-white {
+  background-image: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,249,245,0.7));
+  backdrop-filter: blur(14px);
+}
+
+.shadow-sm {
+  box-shadow: var(--soft-shadow);
+}
+
+.fixed.inset-0,
+[class*="bg-black/"] {
+  animation: backdrop-in var(--motion-slow) var(--ease-premium);
+  backdrop-filter: blur(8px);
+}
+
+[class*="rounded-full"][class*="bg-green"],
+[class*="rounded-full"][class*="bg-amber"],
+[class*="rounded-full"][class*="bg-red"],
+[class*="rounded-full"][class*="bg-blue"],
+[class*="rounded-full"][class*="bg-primary"],
+[class*="rounded-full"][class*="bg-yellow"] {
+  animation: status-pop 700ms var(--ease-premium);
+}
+
+[class*="rounded-full"][class*="bg-red"] {
+  animation: status-pop 700ms var(--ease-premium), badge-pulse 2.4s ease-in-out infinite;
+}
+
+table tbody tr {
+  animation: list-rise 420ms var(--ease-premium) both;
+  transition: background-color var(--motion-base) var(--ease-premium), transform var(--motion-base) var(--ease-premium);
+}
+
+table tbody tr:hover {
+  transform: translateX(2px);
+}
+
+nav button svg,
+nav a svg,
+aside button svg,
+aside a svg {
+  transition: transform var(--motion-base) var(--ease-premium), color var(--motion-base) var(--ease-premium);
+}
+
+nav button:hover svg,
+nav a:hover svg,
+aside button:hover svg,
+aside a:hover svg {
+  transform: translateX(4px) scale(1.08);
+}
+
+aside {
+  animation: sidebar-slide 250ms var(--ease-premium) both;
+}
+
+[role="tab"],
+[class*="rounded-full"][class*="px-"][class*="py-"] {
+  position: relative;
+  overflow: hidden;
+}
+
+[role="tab"]::after,
+[class*="rounded-full"][class*="bg-primary"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 16px 6px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(239, 201, 117, 0.9), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--motion-base) var(--ease-premium);
+}
+
+[role="tab"]:hover::after,
+[class*="rounded-full"][class*="bg-primary"]::after {
+  transform: scaleX(1);
+}
+
+.skeleton-shimmer,
+[class*="animate-pulse"] {
+  background-size: 240% 100%;
+  background-image: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.72), rgba(255,255,255,0));
+}
+
+[role="progressbar"],
+.motion-progress {
+  overflow: hidden;
+  position: relative;
+}
+
+[role="progressbar"] > *,
+.motion-progress > * {
+  animation: progress-grow 900ms var(--ease-premium) both;
+}
+
+[role="progressbar"]::after,
+.motion-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: progress-shine 2s ease-in-out infinite;
+}
+
+.motion-stagger > * {
+  animation: list-rise 460ms var(--ease-premium) both;
+}
+
+.motion-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.motion-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.motion-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.motion-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.motion-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.motion-stagger > *:nth-child(n+7) { animation-delay: 300ms; }
+
+.timeline-step,
+[class*="timeline"] > *,
+[class*="Timeline"] > * {
+  animation: timeline-rise 520ms var(--ease-premium) both;
+}
+
+@supports (animation-timeline: view()) {
+  main .rounded-xl,
+  main .rounded-2xl,
+  main .rounded-3xl,
+  section {
+    animation: scroll-reveal both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+
+  /* Opt-out for pinned UI. A view() timeline holds an element at its `from`
+     keyframe while it sits in the entry range, so anything anchored to the
+     bottom of a scroll container (a chat composer, the newest message) never
+     finishes revealing and renders permanently faded. */
+  .no-scroll-reveal,
+  .no-scroll-reveal .rounded-xl,
+  .no-scroll-reveal .rounded-2xl,
+  .no-scroll-reveal .rounded-3xl,
+  .no-scroll-reveal section {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+@keyframes sidebar-slide {
+  from { opacity: 0; transform: translateX(-18px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes status-pop {
+  0% { transform: scale(0.94); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.24); }
+  55% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(1); box-shadow: none; }
+}
+
+@keyframes badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.12); }
+}
+
+@keyframes list-rise {
+  from { opacity: 0; transform: translateY(12px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes timeline-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progress-grow {
+  from { transform: scaleX(0); transform-origin: left; }
+  to { transform: scaleX(1); transform-origin: left; }
+}
+
+@keyframes progress-shine {
+  100% { transform: translateX(100%); }
+}
+
+@keyframes scroll-reveal {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Custom CSS styles for smooth interactions */
+.transition-all-300 {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.elevation-hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.elevation-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(112, 21, 58, 0.08), 0 4px 6px -2px rgba(112, 21, 58, 0.04);
+}
+
+.glass-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* reduced overlay opacity so cards are less washed-out */
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(239, 201, 117, 0.02));
+  pointer-events: none;
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  animation: skeleton-shimmer 1.8s infinite;
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Background shapes used in the How-it-Works section (moved from inline styles) */
+.bg-left-shape {
+  background: linear-gradient(180deg,#6B0F1A 0%,#8A1234 50%,#D4A24C 100%);
+  border-top-right-radius: 280px;
+  border-bottom-right-radius: 280px;
+}
+
+.bg-right-shape {
+  background: linear-gradient(180deg,#D4A24C 0%,#8A1234 50%,#6B0F1A 100%);
+  border-top-left-radius: 280px;
+  border-bottom-left-radius: 280px;
+}
+
+/* Material Variation Scroll */
+
+.variation-scroll{
+    max-height:520px;
+    overflow-y:auto;
+}
+
+.variation-scroll {
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  scrollbar-width: thin;
+  scrollbar-color: #70153A transparent;
+}
+
+.variation-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.variation-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.variation-scroll::-webkit-scrollbar-thumb {
+  background: #70153A;
+  border-radius: 999px;
+}
+
+.variation-scroll::-webkit-scrollbar-thumb:hover {
+  background: #5B1031;
+}
+/* Legal and About pages: readable long-form typography inside the shared shell. */
+.legal-body p {
+  max-width: 68ch;
+}
+
+.legal-body strong {
+  color: #241318;
+  font-weight: 700;
+}
+
+.legal-body ol,
+.legal-body ul {
+  max-width: 68ch;
+}
+
+.legal-body ol > li::marker {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.legal-body ul > li::marker {
+  color: var(--secondary);
+}
+
+.legal-body li {
+  padding-left: 0.25rem;
+}
+
+.legal-body a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal-body a:hover {
+  color: #4d0e27;
+}

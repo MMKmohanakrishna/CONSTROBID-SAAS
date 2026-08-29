@@ -1,0 +1,846 @@
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import {
+  ArrowRight,
+  BadgeCheck,
+  BarChart3,
+  BriefcaseBusiness,
+  CheckCircle2,
+  ChevronDown,
+  ClipboardCheck,
+  ClipboardList,
+  Clock,
+  Droplet,
+  FileCheck2,
+  Hammer,
+  Home as HomeIcon,
+  Mail,
+  MapPin,
+  Menu,
+  Paintbrush,
+  Phone,
+  Search,
+  Shield,
+  Sparkles,
+  Star,
+  TrendingUp,
+  UserCheck,
+  Users,
+  Wrench,
+  X,
+  Zap,
+} from 'lucide-react';
+import interiorImg from '../../assets/Interior Design.png';
+import civilImg from '../../assets/Civil Construction.png';
+import plumbingImg from '../../assets/Plumbing.png';
+import electricalImg from '../../assets/Electrical.png';
+import paintingImg from '../../assets/Painting.png';
+import carpentryImg from '../../assets/Carpentry.png';
+import logoImg from '../../assets/Logo.png';
+import LogoImg from '../../assets/Logo-B&W.png';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
+import ChatBubble from '../components/ChatBubble';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+function CountUpStat({ value, suffix = '+', label }: { value: number; suffix?: string; label: string }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+
+    let frame = 0;
+    const totalFrames = 70;
+    const counter = window.setInterval(() => {
+      frame += 1;
+      const progress = 1 - Math.pow(1 - frame / totalFrames, 3);
+      setCount(Math.round(value * progress));
+
+      if (frame >= totalFrames) {
+        window.clearInterval(counter);
+        setCount(value);
+      }
+    }, 18);
+
+    return () => window.clearInterval(counter);
+  }, [isInView, value]);
+
+  return (
+    <div ref={ref} className="rounded-lg border border-white/70 bg-white/80 p-6 text-center shadow-lg shadow-primary/5 backdrop-blur-xl">
+      <div className="text-3xl font-bold text-primary font-sans">
+        {count.toLocaleString('en-IN')}
+        {suffix}
+      </div>
+      <div className="mt-1 text-xs font-bold uppercase tracking-widest text-gray-500">{label}</div>
+    </div>
+  );
+}
+
+export default function Home() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('hero');
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [openFaq, setOpenFaq] = useState(0);
+
+  const navLinks = [
+    { label: 'Home', id: 'hero' },
+    { label: 'Services', id: 'services' },
+    { label: 'How It Works', id: 'how-it-works' },
+    { label: 'Reviews', id: 'testimonials' },
+    { label: 'About Us', id: 'about-us' },
+    { label: 'Contact Us', id: 'contact' },
+  ];
+
+  const trustBadges = ['Verified Contractors', 'Site Inspection', 'BOQ Approved', 'Project Monitoring'];
+
+  const heroStats = [
+    { value: '5000+', label: 'Happy Homeowners', icon: Users },
+    { value: '1200+', label: 'Verified Contractors', icon: Shield },
+    { value: '300+', label: 'Projects Completed', icon: BriefcaseBusiness },
+    { value: '25+', label: 'Cities Covered', icon: MapPin },
+  ];
+
+  const services = [
+    { title: 'Interior Design', desc: 'Premium modular kitchens, custom wardrobes, lighting plans, false ceiling, and functional layouts.', icon: Paintbrush, image: interiorImg },
+    { title: 'Civil Construction', desc: 'New builds, structural work, masonry, foundations, and end-to-end residential execution.', icon: HomeIcon, image: civilImg },
+    { title: 'Plumbing', desc: 'Sanitary fittings, pipelines, leakage tracking, drainage mapping, and quality material checks.', icon: Droplet, image: plumbingImg },
+    { title: 'Electrical', desc: 'Wiring maps, switchboards, lighting fixtures, load planning, and verified installation teams.', icon: Zap, image: electricalImg },
+    { title: 'Painting', desc: 'Premium emulsions, textures, waterproofing, wall preparation, and finish inspections.', icon: Wrench, image: paintingImg },
+    { title: 'Carpentry', desc: 'Woodwork, modular furniture, display panels, doors, storage systems, and repair work.', icon: Hammer, image: carpentryImg },
+  ];
+
+  const steps = [
+    { title: 'Post Requirement', desc: 'Share your project needs, city, budget, and timeline.', icon: ClipboardList },
+    { title: 'Site Inspection', desc: 'Our inspection team captures measurements and site conditions.', icon: Search },
+    { title: 'Design & BOQ Creation', desc: 'Technical scope and itemized BOQ are prepared for bidding.', icon: FileCheck2 },
+    { title: 'Contractor Bidding', desc: 'Verified contractors submit transparent quotations.', icon: Users },
+    { title: 'Project Monitoring', desc: 'Milestones, site updates, and quality checks stay visible.', icon: BarChart3 },
+    { title: 'Completion & Review', desc: 'Final verification happens before handover and review.', icon: BadgeCheck },
+  ];
+
+  const whyChoose = [
+    { title: 'Verified Contractors', desc: 'Every contractor is document-verified before bidding.', icon: Shield },
+    { title: 'Inspection Team', desc: 'Independent project verification before and during execution.', icon: ClipboardCheck },
+    { title: 'Transparent Quotations', desc: 'Compare multiple contractor bids with clear scope visibility.', icon: FileCheck2 },
+    { title: 'Project Monitoring', desc: 'Track progress, site updates, milestones, and quality checks.', icon: BarChart3 },
+    { title: 'Quality Assurance', desc: 'Final verification before project completion and handover.', icon: CheckCircle2 },
+  ];
+
+  const contractorBenefits = [
+    { title: 'More Leads', desc: 'Access homeowners with active project requirements.', icon: TrendingUp },
+    { title: 'Verified Projects', desc: 'Bid on inspected and scope-approved projects.', icon: BadgeCheck },
+    { title: 'Easy Quotation Submission', desc: 'Submit structured bids against clear BOQs.', icon: FileCheck2 },
+    { title: 'Portfolio Showcase', desc: 'Build credibility with previous work and ratings.', icon: BriefcaseBusiness },
+    { title: 'Performance Tracking', desc: 'Monitor wins, completion history, and client feedback.', icon: BarChart3 },
+  ];
+
+  const testimonials = [
+    {
+      quote: 'ConstroBID gave us reviewed designs before bidding started. The quotations finally made sense, and the inspection updates helped us stay confident through the full interior project.',
+      name: 'Ramesh Sharma',
+      role: 'Homeowner, Bengaluru',
+      photo: 'RS',
+    },
+    {
+      quote: 'As a contractor, I spend less time chasing unclear leads. Projects arrive with site details and scope, so my team can quote accurately and win better work.',
+      name: 'Karan Mehta',
+      role: 'Partner Contractor',
+      photo: 'KM',
+    },
+    {
+      quote: 'The platform made renovation less stressful. We could compare bids, follow progress, and wait for final quality verification before marking the project complete.',
+      name: 'Priya Nair',
+      role: 'Client, Mumbai',
+      photo: 'PN',
+    },
+  ];
+
+  const faqs = [
+    {
+      question: 'How does ConstroBID work?',
+      answer: 'You post your requirement, ConstroBID coordinates inspection and BOQ creation, verified contractors bid, and the project is monitored until completion.',
+    },
+    {
+      question: 'How are contractors verified?',
+      answer: 'Contractors are checked using business documents, identity details, portfolio information, service categories, and operational city coverage.',
+    },
+    {
+      question: 'Is inspection mandatory?',
+      answer: 'Inspection is recommended for accurate BOQs, transparent bidding, and smoother execution. It helps contractors quote on the same verified scope.',
+    },
+    {
+      question: 'How does bidding work?',
+      answer: 'Once the BOQ is approved, verified contractors submit quotations. You can compare scope, price, timeline, and contractor profile before selection.',
+    },
+    {
+      question: 'What happens after project completion?',
+      answer: 'The completion is reviewed, quality checks are recorded, and the homeowner can submit feedback before the project is closed.',
+    },
+  ];
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveTestimonial((current) => (current + 1) % testimonials.length);
+    }, 4500);
+
+    return () => window.clearInterval(timer);
+  }, [testimonials.length]);
+
+  const scrollToSection = (id: string) => {
+    setMobileMenuOpen(false);
+    setActiveTab(id);
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const postRequirement = () => {
+    if (user && user.role === 'CLIENT') router.push('/client/dashboard?tab=create-project');
+    else router.push('/auth/login?redirect=create-project');
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-brand-dark flex flex-col font-sans">
+      <header className="fixed inset-x-0 top-5 z-50 flex justify-center px-4">
+        <div className="w-[95%] max-w-7xl rounded-[32px] border border-white/15 bg-white/10 backdrop-blur-[28px] shadow-[0_25px_80px_rgba(0,0,0,0.15)] transition-all duration-500">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+            <Link href="/" className="flex items-center gap-3">
+              <Image src={logoImg} alt="CONSTROBID logo" width={180} height={42} className="object-contain" />
+            </Link>
+
+           
+              {navLinks.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => scrollToSection(link.id)}
+                  className={`relative px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeTab === link.id ? 'bg-white/40 text-[#70153A] shadow-sm' : 'text-[#111111] hover:bg-white/20 hover:text-[#70153A]'}`}>
+                  {link.label}
+                  {activeTab === link.id && (
+                    <motion.div
+                      layoutId="navbar-indicator"
+                      className="absolute bottom-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-[#70153A]"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                </button>
+              ))}
+
+            <div className="hidden md:flex items-center gap-3">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => {
+                      if (user.role === 'CLIENT') router.push('/client/dashboard');
+                      else if (user.role === 'CONTRACTOR') router.push('/contractor/dashboard');
+                      else if (user.role === 'INSPECTION_TEAM' || user.role === 'INSPECTOR') router.push('/inspection/dashboard');
+                      else if (user.role === 'ADMIN') router.push('/admin/dashboard');
+                    }}
+                    className="rounded-full bg-[#70153A] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(112,21,58,0.22)] transition-all duration-300 hover:shadow-[0_24px_45px_rgba(112,21,58,0.28)]"
+                  >
+                    Go to Dashboard
+                  </button>
+                  <button onClick={logout} className="text-sm font-semibold text-[#111111] transition-colors hover:text-[#70153A]">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" className="rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-[#111111] transition-all duration-300 hover:bg-white/20">
+                    Login
+                  </Link>
+                  <Link href="/auth/register" className="rounded-full bg-gradient-to-r from-[#70153A] to-[#8C1D49] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(112,21,58,0.22)] transition-all duration-300 hover:scale-[1.01]">
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 text-[#111111] transition-colors hover:text-[#70153A]" aria-label="Toggle menu">
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -24 }}
+            className="lg:hidden fixed inset-x-5 top-24 z-40 rounded-[32px] border border-white/15 bg-white/90 p-5 shadow-[0_25px_80px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+          >
+            <div className="space-y-3">
+              {navLinks.map((link) => (
+                <button key={link.label} onClick={() => scrollToSection(link.id)} className="block w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-[#111111] transition-colors hover:bg-[#f9f2f5]">
+                  {link.label}
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {user ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      if (user.role === 'CLIENT') router.push('/client/dashboard');
+                      else if (user.role === 'CONTRACTOR') router.push('/contractor/dashboard');
+                      else if (user.role === 'INSPECTION_TEAM' || user.role === 'INSPECTOR') router.push('/inspection/dashboard');
+                      else if (user.role === 'ADMIN') router.push('/admin/dashboard');
+                    }}
+                    className="rounded-2xl bg-[#70153A] px-4 py-3 text-sm font-semibold text-white"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      logout();
+                    }}
+                    className="rounded-2xl border border-[#70153A] px-4 py-3 text-sm font-semibold text-[#70153A]"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="rounded-2xl border border-[#70153A] px-4 py-3 text-center text-sm font-semibold text-[#70153A]">
+                    Login
+                  </Link>
+                  <Link href="/auth/register" onClick={() => setMobileMenuOpen(false)} className="rounded-2xl bg-[#70153A] px-4 py-3 text-center text-sm font-semibold text-white">
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <section
+  id="hero"
+  className="relative min-h-screen pt-28 overflow-visible"
+>
+        <div className="absolute inset-0">
+          <div className="hidden sm:block absolute inset-0">
+            <video autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover">
+              <source src="/videos/hero.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div className="sm:hidden absolute inset-0">
+            <Image src="/images/hero-mobile.png" alt="ConstroBID hero" fill className="object-cover" />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/30 to-transparent" />
+        </div>
+
+        <div className="relative z-20 mx-auto flex min-h-[calc(100vh-140px)] max-w-7xl px-6 lg:px-12 items-center">
+         <motion.div
+  variants={staggerContainer}
+  initial="hidden"
+  animate="visible"
+  className="max-w-2xl space-y-6 lg:-mt-16"
+>
+  
+  {/* Heading */}
+  <motion.div
+    variants={fadeUp}
+    className="space-y-4"
+  >
+   <h1
+  className="
+    font-serif
+
+    text-[32px]
+    sm:text-[36px]
+    md:text-[42px]
+    lg:text-[46px]
+    xl:text-[50px]
+
+    leading-[1.05]
+
+    font-bold
+
+    tracking-[-0.02em]
+
+    text-white
+  "
+>
+  From Inspection
+  <br />
+  to Completion.
+
+  <span className="block mt-2 text-[#F9C151]">
+    One Platform.
+    <br />
+    Zero Guesswork.
+  </span>
+</h1>
+
+    <p
+      className="
+        max-w-xl
+
+        text-lg
+
+        leading-8
+
+        text-white/80
+      "
+    >
+      ConstroBID connects homeowners with verified
+      contractors through professional inspections,
+      transparent bidding, BOQ creation, and project
+      monitoring—all on one platform.
+    </p>
+  </motion.div>
+
+  {/* Buttons */}
+  <motion.div
+    variants={fadeUp}
+    className="flex flex-wrap gap-4 pt-2"
+  >
+    <motion.button
+      whileHover={{
+        scale: 1.04,
+        y: -2
+      }}
+      whileTap={{
+        scale: 0.98
+      }}
+      onClick={postRequirement}
+      className="
+        inline-flex
+        items-center
+        gap-3
+
+        rounded-full
+
+        bg-gradient-to-r
+        from-[#70153A]
+        to-[#8C1D49]
+
+        px-7
+        py-3.5
+
+        text-sm
+        font-semibold
+
+        text-white
+
+        shadow-[0_20px_50px_rgba(112,21,58,.35)]
+      "
+    >
+      <ClipboardList size={18} />
+
+      Post Your Requirement
+
+    </motion.button>
+
+    <motion.button
+      whileHover={{
+        scale: 1.04,
+        y: -2
+      }}
+      whileTap={{
+        scale: 0.98
+      }}
+      onClick={() =>
+        router.push('/auth/register?role=CONTRACTOR')
+      }
+      className="
+        inline-flex
+        items-center
+        gap-3
+
+        rounded-full
+
+        border
+        border-white/20
+
+        bg-white/10
+
+        backdrop-blur-xl
+
+        px-7
+        py-3.5
+
+        text-sm
+        font-semibold
+
+        text-white
+
+        hover:bg-white/15
+
+        transition-all
+      "
+    >
+      <UserCheck size={18} />
+
+      Become a Contractor
+
+    </motion.button>
+  </motion.div>
+</motion.div>
+            
+        </div>
+
+        <motion.div
+  variants={fadeUp}
+  className="
+    absolute
+    left-1/2
+    -Bottom-2
+    z-20
+
+    w-[92%]
+    max-w-6xl
+
+    -translate-x-1/2
+
+    rounded-[32px]
+
+    border
+    border-white/15
+
+    bg-white/5
+
+    backdrop-blur-3xl
+
+    shadow-[0_25px_80px_rgba(0,0,0,0.25)]
+
+    p-3
+  "
+>
+  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+
+    {heroStats.map((stat) => (
+      <div
+  key={stat.label}
+  className="
+    flex
+    items-center
+    gap-3
+
+    rounded-2xl
+
+    border
+    border-white/10
+
+    bg-white/5
+
+    px-4
+    py-3
+
+    transition-all
+    duration-300
+
+    hover:bg-white/10
+    hover:-translate-y-1
+  "
+>
+  <div
+    className="
+      flex
+      h-10
+      w-10
+      shrink-0
+
+      items-center
+      justify-center
+
+      rounded-full
+
+      bg-[#70153A]/20
+
+      text-[#EFC975]
+    "
+  >
+    <stat.icon size={16} />
+  </div>
+
+  <div>
+    <p className="text-2xl font-bold text-white leading-none">
+      {stat.value}
+    </p>
+
+    <p
+      className="
+        mt-1
+
+        text-[10px]
+
+        uppercase
+
+        tracking-[0.22em]
+
+        text-white/70
+      "
+    >
+      {stat.label}
+    </p>
+  </div>
+</div>
+    ))}
+
+  </div>
+</motion.div>
+      </section>
+
+      <section id="services" className="relative py-24 bg-[#fff5f7] overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,_rgba(112,21,58,0.12),transparent_50%)]" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full relative">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-12">
+            <div className="max-w-2xl">
+              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-[#70153A]/80">Our Services</div>
+              <h2 className="mt-4 text-4xl lg:text-5xl font-extrabold text-[#6b0f1a] leading-tight">Premium construction services for every project stage</h2>
+              <p className="mt-4 text-base text-[#4b2d38] max-w-xl leading-8">Turn every renovation, interior fit-out, or construction project into a verified, quality-controlled experience with specialists, inspections, and BOQ-backed bids.</p>
+            </div>
+            <button onClick={() => router.push('/services')} className="inline-flex items-center gap-2 rounded-full border border-[#70153A]/20 bg-white px-5 py-3 text-sm font-semibold text-[#70153A] shadow-sm hover:bg-white/95 transition">
+              View All Services
+              <ArrowRight size={16} />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {services.map((svc, index) => (
+              <motion.div key={svc.title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: index * 0.06 }} className="group rounded-[32px] border border-white/80 bg-white/90 p-6 shadow-[0_24px_60px_rgba(112,21,58,0.08)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(112,21,58,0.12)]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#fde9ee] text-[#70153A] shadow-inner shadow-[#70153A]/10 mb-6">
+                  <svc.icon size={24} />
+                </div>
+                <h3 className="text-xl font-bold text-[#30111b]">{svc.title}</h3>
+                <p className="mt-4 text-sm leading-7 text-[#5c414b]">{svc.desc}</p>
+                <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#70153A]">
+                  Learn more
+                  <ArrowRight size={14} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" className="relative py-24 bg-white overflow-hidden">
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 transform rounded-full bg-[#F7E7E9] blur-3xl opacity-80 h-72 w-72" />
+        <div className="absolute right-0 top-16 rounded-full bg-[#F8F0F2] blur-3xl opacity-80 h-64 w-64" />
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full relative z-10">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="text-center max-w-4xl mx-auto mb-16">
+            <motion.span variants={fadeUp} className="text-xs font-bold text-[#70153A] tracking-[0.26em] uppercase block">How ConstroBID Works</motion.span>
+            <motion.h2 variants={fadeUp} className="mt-4 text-4xl lg:text-5xl font-extrabold text-[#6b0f1a] font-serif leading-tight">A Clear Workflow From Requirement to Handover</motion.h2>
+            <motion.p variants={fadeUp} className="mt-5 text-lg text-[#5c434d] leading-relaxed">A managed construction marketplace needs visible processes. Every stakeholder stays aligned from inspection to project completion.</motion.p>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {steps.map((step, index) => (
+              <motion.div key={step.title} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ delay: index * 0.07 }} className="group rounded-[32px] border border-[#f2d8dd] bg-white p-8 shadow-[0_30px_80px_rgba(112,21,58,0.08)] transition hover:-translate-y-1 hover:shadow-[0_35px_90px_rgba(112,21,58,0.12)]">
+                <div className="inline-flex h-16 w-16 items-center justify-center rounded-3xl bg-[#fde9ee] text-[#70153A] shadow-sm">
+                  <step.icon size={24} />
+                </div>
+                <div className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-[#70153A]/90">Step {index + 1}</div>
+                <h3 className="mt-4 text-xl font-bold text-[#31131f]">{step.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[#5c434d]">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="testimonials" className="relative overflow-hidden bg-[#fbfafc] py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto w-full max-w-7xl px-6 lg:px-12">
+          <div className="mb-10 text-center sm:mb-12">
+            <span className="text-xs font-bold uppercase tracking-[0.28em] text-[#70153A]">Testimonials</span>
+            <h2 className="mt-3 font-serif text-3xl font-extrabold leading-tight text-[#32121a] sm:text-4xl">What our customers say</h2>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3 lg:gap-7">
+            {testimonials.map((test, idx) => (
+              <motion.button
+                key={test.name}
+                type="button"
+                onClick={() => setActiveTestimonial(idx)}
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.45, delay: idx * 0.08 }}
+                className={`group ${idx === activeTestimonial ? 'flex' : 'hidden md:flex'} min-h-[360px] flex-col rounded-[18px] border bg-white p-8 text-left shadow-[0_20px_50px_rgba(38,20,30,0.07)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(38,20,30,0.11)] sm:p-10 md:min-h-[394px] ${activeTestimonial === idx ? 'border-[#f1e4e7]' : 'border-[#f3eef0]'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-1" aria-label="5 out of 5 stars">
+                    {Array.from({ length: 5 }).map((_, starIndex) => (
+                      <Star key={starIndex} size={19} strokeWidth={2.5} className="fill-[#fbb51c] text-[#fbb51c]" />
+                    ))}
+                  </div>
+                  <span aria-hidden="true" className="font-serif text-2xl font-bold leading-none text-[#d8dce2]">“</span>
+                </div>
+
+                <p className="mt-10 flex-1 text-[17px] leading-[1.9] text-[#526071] sm:mt-11">{test.quote}</p>
+
+                <div className="mt-8 flex items-center gap-4">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#f5e8eb] text-lg font-bold text-[#70153A]">{test.photo}</div>
+                  <div>
+                    <div className="text-base font-bold text-[#1f2937]">{test.name}</div>
+                    <div className="mt-1 text-sm text-[#7b8794]">{test.role}</div>
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="mt-8 flex items-center justify-center gap-4" aria-label="Select testimonial">
+            {testimonials.map((test, idx) => (
+              <button
+                key={test.name}
+                type="button"
+                aria-label={`Show testimonial ${idx + 1}`}
+                aria-current={activeTestimonial === idx ? 'true' : undefined}
+                onClick={() => setActiveTestimonial(idx)}
+                className={`h-3 w-3 rounded-full transition-all duration-300 ${activeTestimonial === idx ? 'w-10 bg-[#70153A]' : 'bg-[#d9bfc7] hover:bg-[#bd9aa6]'}`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ section removed as requested */}
+
+      <section id="contact" className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full">
+          <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-lg border border-gray-100">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+              <div className="lg:col-span-4">
+                <div className="space-y-3">
+                  <span className="text-xs font-semibold text-gray-400 tracking-widest uppercase block">GET IN TOUCH</span>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-[#6b0f1a]">We're Here to Help</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">Have questions about scheduling inspections or contractor verification? Write to our support managers or call us.</p>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  {[
+                    { label: 'Email Support', value: 'Anirban@constrobid.com', icon: Mail },
+                    { label: 'Office Address', value: '12th Floor, Trade Towers, Outer Ring Road, Bangalore, India', icon: MapPin },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-start gap-4">
+                      <div className="w-11 h-11 rounded-full bg-[#6b0f1a] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <item.icon size={16} />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-700">{item.label}</div>
+                        <div className="text-sm font-bold text-gray-900 mt-1">{item.value}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg:col-span-4">
+                <div className="w-full h-[300px] rounded-lg overflow-hidden bg-gray-50 border border-gray-100">
+                  <div className="w-full h-full bg-[url('/images/map_placeholder.png')] bg-center bg-cover flex items-center justify-center text-gray-400">Map Placeholder</div>
+                </div>
+              </div>
+
+              <form className="lg:col-span-4 bg-transparent p-0" onSubmit={(e) => { e.preventDefault(); alert('Query submitted. Our team will contact you shortly.'); }}>
+                <div className="bg-white rounded-lg border border-gray-100 p-6 shadow-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 block">Your Name</label>
+                      <input type="text" required placeholder="Enter name" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#6b0f1a]" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 block">Phone Number</label>
+                      <input type="tel" required placeholder="Enter phone" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#6b0f1a]" />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <label className="text-xs font-semibold text-gray-500 block">Email Address</label>
+                    <input type="email" required placeholder="Enter email" className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#6b0f1a]" />
+                  </div>
+                  <div className="mt-4">
+                    <label className="text-xs font-semibold text-gray-500 block">Your Query</label>
+                    <textarea rows={4} required placeholder="Describe your requirements or questions..." className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md text-sm focus:outline-none focus:border-[#6b0f1a] resize-none" />
+                  </div>
+                  <button type="submit" className="mt-5 w-full py-3.5 bg-[#6b0f1a] text-white text-sm font-bold rounded-md hover:bg-[#5a0c15] transition-colors">Send Message</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="mt-auto bg-[#6b0f1a] text-white py-5 border-t border-[#5a0c15]">
+        <div className="max-w-10xl mx-auto px-6 lg:px-20 w-full grid grid-cols-1 md:grid-cols-4 gap-10 pt-8 ">
+          <div className="space-y-3">
+            <Image src={LogoImg} alt="CONSTROBID logo" width={220} height={48} className="object-contain" />
+            <p className="text-sm text-[#ffecec] leading-relaxed pt-2">India's inspection-managed construction and interior design marketplace connecting homeowners with verified builders.</p>
+
+            <div className="flex items-center gap-3 mt-4">
+              <a href="#" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">F</a>
+              <a href="#" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">in</a>
+              <a href="#" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors">You</a>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-[#ffd9d9] mb-4 uppercase tracking-wider">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-[#ffecec]">
+              <li><button onClick={() => scrollToSection('hero')} className="hover:text-white transition-colors">Home</button></li>
+              <li><button onClick={() => scrollToSection('services')} className="hover:text-white transition-colors">Services Directory</button></li>
+              <li><button onClick={() => scrollToSection('how-it-works')} className="hover:text-white transition-colors">How It Works</button></li>
+              <li><button onClick={() => scrollToSection('testimonials')} className="hover:text-white transition-colors">Client Reviews</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-[#ffd9d9] mb-4 uppercase tracking-wider">User Dashboards</h4>
+            <ul className="space-y-2 text-sm text-[#ffecec]">
+              <li><Link href="/auth/login" className="hover:text-white transition-colors">Homeowner Portal</Link></li>
+              <li><Link href="/auth/login" className="hover:text-white transition-colors">Contractor Workspace</Link></li>
+              <li><Link href="/auth/login" className="hover:text-white transition-colors">Inspection Team Hub</Link></li>
+              <li><Link href="/admin/login" className="hover:text-white transition-colors">Super Admin Console</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-[#ffd9d9] mb-4 uppercase tracking-wider">Legal Terms</h4>
+            <ul className="space-y-2 text-sm text-[#ffecec]">
+              <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Dispute Resolution Policy</Link></li>
+              <li><Link href="#" className="hover:text-white transition-colors">Commission Structure</Link></li>
+            </ul>
+          </div>
+
+          
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 w-full mt-5 pt-1 border-t border-[#5a0c15] text-center text-sm text-[#ffd9d9]">
+          <div>&copy; {new Date().getFullYear()} ConstroBID Technologies Pvt. Ltd. All rights reserved.</div>
+          <div className="pt-3">Designed &amp; Developed by Mohana Krishna</div>
+        </div>
+      </footer>
+      <ChatBubble />
+    </div>
+  );
+}

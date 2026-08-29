@@ -1,0 +1,184 @@
+{
+  "project": "Phase 5 - Project Monitoring",
+  "generatedAt": "2026-06-13T00:00:00Z",
+  "developmentOrder": [
+    "Database Models",
+    "Backend APIs",
+    "Frontend UI",
+    "Integration",
+    "Testing"
+  ],
+  "tasks": [
+    {
+      "id": "DB-01",
+      "area": "Database",
+      "title": "ProjectUpdates model",
+      "description": "Create `ProjectUpdate` collection and Mongoose model to record progress updates, delays and QA notes.",
+      "dependencies": [],
+      "estimatedFiles": ["backend/src/models/ProjectUpdate.ts"],
+      "completionCriteria": "Model schema implemented, migrations/seed optional, index on projectId created, unit tests for validation present"
+    },
+    {
+      "id": "DB-02",
+      "area": "Database",
+      "title": "SiteVisitReports model",
+      "description": "Create `SiteVisitReport` collection and model for inspector visit records including photos, geoLocation and issues.",
+      "dependencies": [],
+      "estimatedFiles": ["backend/src/models/SiteVisitReport.ts"],
+      "completionCriteria": "Model implemented with indexes; photo refs stored as ObjectId; schema validation enforced"
+    },
+    {
+      "id": "DB-03",
+      "area": "Database",
+      "title": "MonitoringReports cache model",
+      "description": "Create `MonitoringReport` schema to store weekly aggregated metrics for fast dashboard queries.",
+      "dependencies": ["DB-01","DB-02"],
+      "estimatedFiles": ["backend/src/models/MonitoringReport.ts"],
+      "completionCriteria": "Model implemented; scheduled job can write and read aggregates; TTL index optional"
+    },
+    {
+      "id": "BE-01",
+      "area": "Backend",
+      "title": "Monitoring routes and controller scaffolding",
+      "description": "Add `monitoring.routes.ts` and `monitoring.controller.ts` with endpoint skeletons for summary, list, create update and site-visit APIs.",
+      "dependencies": ["DB-01","DB-02","DB-03"],
+      "estimatedFiles": ["backend/src/routes/monitoring.routes.ts","backend/src/controllers/monitoring.controller.ts"],
+      "completionCriteria": "Routes registered in index; endpoints authenticate and return stubbed responses; integration tests can call endpoints"
+    },
+    {
+      "id": "BE-02",
+      "area": "Backend",
+      "title": "Create ProjectUpdate controller logic",
+      "description": "Implement create/read for ProjectUpdates with validation, ObjectId conversion and audit logging.",
+      "dependencies": ["BE-01","DB-01"],
+      "estimatedFiles": ["backend/src/controllers/monitoring.controller.ts","backend/src/services/auditLog.ts"],
+      "completionCriteria": "Create and list operations persist correct documents; audit logs created for create/update actions"
+    },
+    {
+      "id": "BE-03",
+      "area": "Backend",
+      "title": "SiteVisitReport endpoints",
+      "description": "Implement POST/GET for inspector site visits, photo references, geoLocation and issues.",
+      "dependencies": ["BE-01","DB-02"],
+      "estimatedFiles": ["backend/src/controllers/monitoring.controller.ts"],
+      "completionCriteria": "Site visit creation validates inspector role and stores photos as `DesignFile` refs; GET returns list and detail"
+    },
+    {
+      "id": "BE-04",
+      "area": "Backend",
+      "title": "Monitoring summary and metrics endpoints",
+      "description": "Implement summary endpoints that read MonitoringReports or compute aggregates on demand.",
+      "dependencies": ["DB-03","BE-02","BE-03"],
+      "estimatedFiles": ["backend/src/controllers/monitoring.controller.ts"],
+      "completionCriteria": "Summary endpoints return KPIs used by frontend dashboard with pagination and filters"
+    },
+    {
+      "id": "BE-05",
+      "area": "Backend",
+      "title": "Validation & Audit logging",
+      "description": "Add strong request validation (ObjectId checks, required fields, ranges) and hook audit log creation for key operations.",
+      "dependencies": ["BE-02","BE-03"],
+      "estimatedFiles": ["backend/src/middlewares/validation.ts","backend/src/services/auditLog.ts"],
+      "completionCriteria": "Requests with invalid payloads return 400; audit log entries present for create/update/delete operations"
+    },
+    {
+      "id": "BE-06",
+      "area": "Backend",
+      "title": "Background scheduler for monitoring aggregates",
+      "description": "Implement scheduled job to compute weekly MonitoringReports and push to cache collection.",
+      "dependencies": ["DB-03","BE-04"],
+      "estimatedFiles": ["backend/src/services/monitoringJob.ts","backend/src/cron/monitoring.cron.ts"],
+      "completionCriteria": "Job runs locally and populates MonitoringReports; endpoints serve cached metrics"
+    },
+    {
+      "id": "FE-01",
+      "area": "Frontend",
+      "title": "Monitoring Dashboard page",
+      "description": "Create dashboard showing KPIs: Projects Under Monitoring, Delayed Projects, Weekly Site Visits, Completion Requests.",
+      "dependencies": ["BE-04"],
+      "estimatedFiles": ["frontend/src/app/monitoring/dashboard/page.tsx","frontend/src/components/monitoring/MonitoringWidget.tsx"],
+      "completionCriteria": "Dashboard fetches summary endpoint and displays KPIs; responsive layout passes visual review"
+    },
+    {
+      "id": "FE-02",
+      "area": "Frontend",
+      "title": "Monitoring list (projects under monitoring)",
+      "description": "Implement paginated list with filters and search for monitored projects.",
+      "dependencies": ["BE-04"],
+      "estimatedFiles": ["frontend/src/app/monitoring/page.tsx","frontend/src/components/monitoring/MonitoringList.tsx"],
+      "completionCriteria": "List queries backend with filters; clicking a row navigates to detail page"
+    },
+    {
+      "id": "FE-03",
+      "area": "Frontend",
+      "title": "Monitoring detail / project timeline",
+      "description": "Project detail page with ProjectTimeline and last SiteVisitReports and ProjectUpdates.",
+      "dependencies": ["FE-02","BE-02","BE-03"],
+      "estimatedFiles": ["frontend/src/app/monitoring/project/[id]/page.tsx","frontend/src/components/monitoring/ProjectTimeline.tsx"],
+      "completionCriteria": "Detail page shows timeline, photos, and ability to add a progress update (form present)"
+    },
+    {
+      "id": "FE-04",
+      "area": "Frontend",
+      "title": "Progress update form & photo upload",
+      "description": "Form to submit `ProjectUpdate` with percentComplete, notes and photo uploads; client-side validation.",
+      "dependencies": ["BE-02","BE-03"],
+      "estimatedFiles": ["frontend/src/components/monitoring/VisitForm.tsx","frontend/src/components/monitoring/PhotoUploader.tsx"],
+      "completionCriteria": "Form validates locally and submits to backend; uploaded photos show previews"
+    },
+    {
+      "id": "FE-05",
+      "area": "Frontend",
+      "title": "Site Visit Reports UI",
+      "description": "Inspector visit reporting screens (create + view) mobile-first.",
+      "dependencies": ["BE-03"],
+      "estimatedFiles": ["frontend/src/app/monitoring/visits/create/page.tsx","frontend/src/app/monitoring/visits/[id]/page.tsx"],
+      "completionCriteria": "Inspector can submit a visit report with photos and geoLocation; reports are listed in project detail"
+    },
+    {
+      "id": "FE-06",
+      "area": "Frontend",
+      "title": "Delay & Quality tracking components",
+      "description": "UI widgets to flag delays and run QA checks, with status badges and filtering.",
+      "dependencies": ["BE-02","FE-03"],
+      "estimatedFiles": ["frontend/src/components/monitoring/DelayBadge.tsx","frontend/src/components/monitoring/QAStatus.tsx"],
+      "completionCriteria": "Delays can be recorded and filtered; QA statuses display correctly"
+    },
+    {
+      "id": "INT-01",
+      "area": "Integration",
+      "title": "End-to-end monitoring flow",
+      "description": "Integrate backend and frontend flows: create update → visit → aggregate → dashboard reflects changes.",
+      "dependencies": ["BE-01","BE-02","BE-03","FE-01","FE-03"],
+      "estimatedFiles": [],
+      "completionCriteria": "Smoke test demonstrates E2E flow for a test project (tools/testing/smoke_test.js updated accordingly)"
+    },
+    {
+      "id": "TEST-01",
+      "area": "Testing",
+      "title": "Unit tests and validation tests",
+      "description": "Add unit tests for models and controller validation rules.",
+      "dependencies": ["DB-01","BE-02","BE-03"],
+      "estimatedFiles": ["backend/test/models/projectUpdate.test.ts","backend/test/controllers/monitoring.test.ts"],
+      "completionCriteria": "Unit tests covering validation and key controller behavior pass in CI"
+    },
+    {
+      "id": "TEST-02",
+      "area": "Testing",
+      "title": "Runtime / smoke tests",
+      "description": "Extend `tools/testing/smoke_test.js` to include monitoring flows and assert KPIs.",
+      "dependencies": ["INT-01","TEST-01"],
+      "estimatedFiles": ["tools/testing/smoke_test.js"],
+      "completionCriteria": "Smoke tests pass end-to-end in local dev environment"
+    }
+  ],
+  "roadmap": {
+    "phase1_database": { "tasks": ["DB-01","DB-02","DB-03"], "estimate_days": 3 },
+    "phase2_backend": { "tasks": ["BE-01","BE-02","BE-03","BE-04","BE-05","BE-06"], "estimate_days": 7 },
+    "phase3_frontend": { "tasks": ["FE-01","FE-02","FE-03","FE-04","FE-05","FE-06"], "estimate_days": 7 },
+    "phase4_integration": { "tasks": ["INT-01"], "estimate_days": 2 },
+    "phase5_testing": { "tasks": ["TEST-01","TEST-02"], "estimate_days": 3 },
+    "total_estimate_days": 22,
+    "notes": "Estimates assume a single developer; adjust for team size. Include buffer for reviews and QA."
+  }
+}
