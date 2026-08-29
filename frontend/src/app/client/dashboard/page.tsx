@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { 
@@ -34,7 +34,7 @@ import RecentQuotes from '../../../components/client/RecentQuotes';
 import RecentPayments from '../../../components/client/RecentPayments';
 import { useRealtimeRefresh } from '@/components/RealtimeSyncProvider';
 
-export default function ClientDashboard() {
+function ClientDashboardContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1263,5 +1263,21 @@ material specifications and contractor experience.
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+export default function ClientDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-gray-500">
+            Loading dashboard...
+          </div>
+        </div>
+      }
+    >
+      <ClientDashboardContent />
+    </Suspense>
   );
 }

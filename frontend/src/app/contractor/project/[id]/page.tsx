@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
@@ -124,7 +124,7 @@ function CostBreakdownTotal({ label, value }: { label: string; value: number }) 
   );
 }
 
-export default function ContractorProjectDetails() {
+function ContractorProjectDetailsContent() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -2495,11 +2495,27 @@ setTodayAttendance(attendanceResponse.attendance);
 
 
 
-            </div>	
+            </div>
           </div>
         </main>
       </div>
     </div>
+  );
+}
+
+export default function ContractorProjectDetails() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-gray-500">
+            Loading project...
+          </div>
+        </div>
+      }
+    >
+      <ContractorProjectDetailsContent />
+    </Suspense>
   );
 }
 

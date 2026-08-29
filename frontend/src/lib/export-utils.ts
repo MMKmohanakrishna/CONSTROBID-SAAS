@@ -46,13 +46,19 @@ export async function exportAttendanceCsv(records: any[], projectName: string) {
     return;
   }
 
-  const columns = Object.keys(rows[0]);
-  const csvData = [columns.join(','),
-    ...rows.map((row) => columns.map((column) => {
-      const value = String(row[column] ?? '');
-      return `"${value.replace(/"/g, '""')}"`;
-    }).join(','))
-  ].join('\r\n');
+  const columns = Object.keys(rows[0]) as Array<keyof (typeof rows)[number]>;
+
+const csvData = [
+  columns.join(','),
+  ...rows.map((row) =>
+    columns
+      .map((column) => {
+        const value = String(row[column] ?? '');
+        return `"${value.replace(/"/g, '""')}"`;
+      })
+      .join(',')
+  ),
+].join('\r\n');
 
   const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
   downloadFile(blob, `${projectName.replace(/\s+/g, '_')}_attendance.csv`);

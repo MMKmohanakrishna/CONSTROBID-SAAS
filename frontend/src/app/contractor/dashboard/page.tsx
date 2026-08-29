@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import BiddingCountdown from "@/components/common/BiddingCountdown";
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -37,7 +37,7 @@ import logoPng from '../../../../assets/Logo-B&W.png';
 import FilterSelect from '@/components/common/FilterSelect';
 import { useRealtimeRefresh } from '@/components/RealtimeSyncProvider';
 
-export default function ContractorDashboard() {
+function ContractorDashboardContent() {
   const { user, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   const { openFile } = useLightbox();
@@ -1718,7 +1718,23 @@ allProjects.forEach((p: any) => {
             </motion.div>
           </div>
         )}
-      </AnimatePresence>
+            </AnimatePresence>
     </div>
+  );
+}
+
+export default function ContractorDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-sm text-gray-500">
+            Loading dashboard...
+          </div>
+        </div>
+      }
+    >
+      <ContractorDashboardContent />
+    </Suspense>
   );
 }

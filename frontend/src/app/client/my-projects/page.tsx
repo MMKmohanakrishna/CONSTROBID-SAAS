@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { projectApi } from "@/lib/api";
 import { useRealtimeRefresh } from "@/components/RealtimeSyncProvider";
-export default function MyProjectsPage() {
+function MyProjectsContent() {
   const router = useRouter();
 
     const [projects, setProjects] = useState<any[]>([]);
@@ -469,5 +469,21 @@ const activeConstructionCount = myProjects.filter(
 </div>
 
     </div>
+  );
+}
+
+export default function MyProjectsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8F8FA] flex items-center justify-center">
+          <div className="text-[#70153A] font-semibold">
+            Loading projects...
+          </div>
+        </div>
+      }
+    >
+      <MyProjectsContent />
+    </Suspense>
   );
 }
